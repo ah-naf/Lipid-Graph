@@ -4,7 +4,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import am5themes_Micro from "@amcharts/amcharts5/themes/Dataviz";
 import am5themes_Responsive from "@amcharts/amcharts5/themes/Responsive";
 import { useLayoutEffect } from "react";
-import { graph_data } from "./utility";
+import { graph_data } from "../utility";
 // import "./App.css";
 
 const data = JSON.parse(graph_data);
