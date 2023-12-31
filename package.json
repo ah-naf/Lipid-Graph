@@ -17,6 +17,7 @@
     "@mui/icons-material": "^5.14.19",
     "@mui/lab": "^5.0.0-alpha.158",
     "@mui/material": "^5.15.2",
+    "ag-grid-react": "^31.0.1",
     "antd": "^5.12.5",
     "axios": "^1.6.2",
     "jsontohtml-render": "^1.0.8",

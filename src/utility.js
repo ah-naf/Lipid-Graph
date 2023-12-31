@@ -52,9 +52,9 @@ export const parseExcel = (input) => {
   });
 };
 
-export const parseCsv = (file) => {
+export const parseCsv = (input) => {
   return new Promise((resolve, reject) => {
-    Papa.parse(file, {
+    const parseOptions = {
       header: true,
       dynamicTyping: true,
       complete: (results) => {
@@ -64,7 +64,9 @@ export const parseCsv = (file) => {
             (_, index) => !results.errors.some((error) => error.row === index)
           );
           data = validData;
-        } else data = results.data;
+        } else {
+          data = results.data;
+        }
 
         const temp = data.map((row) => {
           const modifiedRow = { ...row };
@@ -79,7 +81,29 @@ export const parseCsv = (file) => {
       error: (error) => {
         reject(error);
       },
-    });
+    };
+
+    // Check if the input is a File object
+    if (input instanceof File) {
+      Papa.parse(input, parseOptions);
+    }
+    // Otherwise, assume it's a file path
+    else if (typeof input === "string") {
+      fetch(input)
+        .then((response) => response.text())
+        .then((csvString) => {
+          Papa.parse(csvString, { ...parseOptions, download: false });
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    } else {
+      reject(
+        new Error(
+          "Invalid input: Input should be a File object or a file path string."
+        )
+      );
+    }
   });
 };
 

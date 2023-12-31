@@ -1,17 +1,11 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Button,
-  Typography,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { jsontohtml } from "jsontohtml-render";
 import * as React from "react";
+import AgGridTable from "../Components/AgGridTable";
 import bendingFile from "../bending-modulus.xlsx";
+import molecules from "../molecules.csv";
 import { parseCsv, parseExcel } from "../utility";
 
 const VisuallyHiddenInput = styled("input")({
@@ -29,8 +23,21 @@ const VisuallyHiddenInput = styled("input")({
 function Upload() {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState([]);
-  const [lipid_name, setLipidName] = React.useState([]);
-  const [jsonData, setJsonData] = React.useState([]);
+
+  // Function to parse the Nodes_features string into nodes and features
+  function parseNodesFeatures(nodesFeaturesStr) {
+    const regex = /\('([^']*)','([^']*)'\)/g;
+    let match;
+    const nodes = [];
+    const features = [];
+
+    while ((match = regex.exec(nodesFeaturesStr)) !== null) {
+      nodes.push(match[1]);
+      features.push(match[2]);
+    }
+
+    return { nodes, features };
+  }
 
   const handleFileChange = async (evt) => {
     setLoading(true);
@@ -46,20 +53,50 @@ function Upload() {
     // setData(fileData);
     const temp_key = Object.keys(fileData[0]);
     const temp_data = fileData.map((val) => "100% " + val[temp_key]);
-    setLipidName(temp_data);
 
-    // Find the matching value
-    const matchingValues = mainData.filter((item) =>
-      temp_data.includes(item["Lipid composition (molar)"])
-    );
+    let matchingValues = [];
+    const usedTempData = new Set();
+
+    mainData.forEach((item) => {
+      const lipidValue = item["Lipid composition (molar)"];
+      if (temp_data.includes(lipidValue) && !usedTempData.has(lipidValue)) {
+        matchingValues.push(item);
+        usedTempData.add(lipidValue);
+      }
+    });
+
+    matchingValues = matchingValues.map(({ Index, Path, ...rest }) => rest);
+
+    const moleculesData = await parseCsv(molecules);
+    console.log(moleculesData);
+
+    // Assuming matchingValues and moleculesData are already defined and populated
+    for (let i = 0; i < matchingValues.length; i++) {
+      // Find the corresponding entry in moleculesData
+      const correspondingEntry = moleculesData.find(
+        (molecule) =>
+          molecule["Lipid composition (molar)"] ===
+          matchingValues[i]["Lipid composition (molar)"]
+      );
+      // If a matching entry is found, parse and add the 'Nodes_features' values
+      if (correspondingEntry) {
+        const { nodes, features } = parseNodesFeatures(
+          correspondingEntry.node_features
+        );
+        matchingValues[i].nodes = nodes;
+        matchingValues[i].features = features;
+        matchingValues[i].edge = correspondingEntry.edge;
+      }
+    }
+
+    // Now matchingValues includes the parsed nodes and features from Nodes_features where the Lipid composition (molar) matches
 
     setData(matchingValues);
-    setJsonData(matchingValues.map((val) => jsontohtml(val)));
 
     setLoading(false);
   };
   return (
-    <div className="min-h-screen grid place-content-center max-w-xl mx-auto">
+    <div className="min-h-screen grid content-center px-8 w-full mx-auto">
       <div className="text-center space-x-4">
         <LoadingButton
           loading={loading}
@@ -77,8 +114,6 @@ function Upload() {
             color="error"
             onClick={() => {
               setData([]);
-              setJsonData([]);
-              setLipidName([]);
               window.location.reload();
             }}
           >
@@ -86,26 +121,9 @@ function Upload() {
           </Button>
         )}
       </div>
-
-      {!!data.length && (
-        <div className="mt-8 bg-[whitesmoke] p-4 rounded shadow-lg max-h-[500px] overflow-y-auto">
-          {data.map((val, key) => (
-            <Accordion key={key}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography>{val["Lipid composition (molar)"]}</Typography>
-              </AccordionSummary>
-              <AccordionDetails className="overflow-x-auto">
-                <div
-                  className="h-full w-full"
-                  dangerouslySetInnerHTML={{ __html: jsonData[key] }}
-                ></div>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+      {data && data.length > 0 && (
+        <div className="w-full mt-10">
+          <AgGridTable rowData={data} />
         </div>
       )}
     </div>
