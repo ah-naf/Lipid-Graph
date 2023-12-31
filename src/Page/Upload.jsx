@@ -24,21 +24,6 @@ function Upload() {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState([]);
 
-  // Function to parse the Nodes_features string into nodes and features
-  function parseNodesFeatures(nodesFeaturesStr) {
-    const regex = /\('([^']*)','([^']*)'\)/g;
-    let match;
-    const nodes = [];
-    const features = [];
-
-    while ((match = regex.exec(nodesFeaturesStr)) !== null) {
-      nodes.push(match[1]);
-      features.push(match[2]);
-    }
-
-    return { nodes, features };
-  }
-
   const handleFileChange = async (evt) => {
     setLoading(true);
     const file = evt.target.files[0];
@@ -65,7 +50,9 @@ function Upload() {
       }
     });
 
-    matchingValues = matchingValues.map(({ Index, Path, ...rest }) => rest);
+    matchingValues = matchingValues.map(
+      ({ Index, Path, Barostat, Thermostat, "Salt, M": salt, ...rest }) => rest
+    );
 
     const moleculesData = await parseCsv(molecules);
     console.log(moleculesData);
@@ -80,12 +67,11 @@ function Upload() {
       );
       // If a matching entry is found, parse and add the 'Nodes_features' values
       if (correspondingEntry) {
-        const { nodes, features } = parseNodesFeatures(
-          correspondingEntry.node_features
-        );
-        matchingValues[i].nodes = nodes;
-        matchingValues[i].features = features;
-        matchingValues[i].edge = correspondingEntry.edge;
+        matchingValues[i] = {
+          node_features: correspondingEntry.node_features,
+          edge: correspondingEntry.edge,
+          ...matchingValues[i],
+        };
       }
     }
 
