@@ -5,4 +5,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react()],
   assetsInclude: ["**/*.xlsx", "**/*.csv"],
+  server: {
+    host: true,
+    strictPort: true,
+    port: 5173,
+  },
 });
