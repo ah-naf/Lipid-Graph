@@ -5,6 +5,7 @@ import Header from "../Components/Header";
 import LipidInputForm from "../Components/LipidInputForm";
 import OperationsPanel from "../Components/OperationsPanel";
 import SelectComponentType from "../Components/SelectComponentType";
+import UploadFile from "../Components/UploadFile";
 
 // const data = JSON.parse(graph_data);
 const data = [];
@@ -50,6 +51,7 @@ function Lipid() {
               />
             </div>
             {lipidInput.length > 0 && <OperationsPanel />}
+            <UploadFile />
             <div className="absolute z-50 left-0 text-center bottom-0 border-t-2 w-full py-2">
               <Link
                 to={"/about-us"}
