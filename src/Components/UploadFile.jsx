@@ -12,6 +12,7 @@ function UploadFile() {
         types={["csv", "xlsx"]}
         onDrop={(e) => console.log(e)}
         onChange={(e) => console.log(e)}
+        classes="dndFile"
       />
     </div>
   );

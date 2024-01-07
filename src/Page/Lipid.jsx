@@ -22,11 +22,13 @@ function Lipid() {
   };
 
   return (
-    <div className="h-screen flex relative overflow-hidden">
+    <div className="h-screen  relative overflow-hidden">
+      <Header />
       <div
-        className={`h-full relative w-[370px] border-r-2 shadow-xl p-4 bg-[whitesmoke] ${
+        className={`relative w-[320px] border-r-2 shadow-xl p-4 bg-[whitesmoke] ${
           collapse && "max-w-[0] !p-0"
         }`}
+        style={{ height: "calc(100vh - 68px)" }}
       >
         <span
           className={`absolute right-0 top-1/2 translate-x-1/2 bg-white shadow-lg border-2 cursor-pointer ${
@@ -63,9 +65,7 @@ function Lipid() {
           </>
         )}
       </div>
-      <div className="w-full h-full relative">
-        <Header />
-      </div>
+      <div className="w-full h-full relative"></div>
     </div>
   );
 }
