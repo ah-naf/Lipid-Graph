@@ -32,7 +32,7 @@ const OperationsPanel = () => {
   }));
   return (
     <div className="mt-6">
-      <p className="font-medium text-gray-800/80 text-center">Operations</p>
+      <p className="font-medium text-gray-800/80 text-center text-sm underline">Operations</p>
       <div className="mt-2">
         <TreeView
           aria-label="controlled"

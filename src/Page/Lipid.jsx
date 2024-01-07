@@ -1,8 +1,7 @@
 import { ArrowRight } from "@mui/icons-material";
-import InfoIcon from "@mui/icons-material/Info";
-import { Button } from "@mui/material";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Header from "../Components/Header";
 import LipidInputForm from "../Components/LipidInputForm";
 import OperationsPanel from "../Components/OperationsPanel";
 import SelectComponentType from "../Components/SelectComponentType";
@@ -18,14 +17,13 @@ function Lipid() {
   const handleInputChange = (index, field, value) => {
     const updatedInputs = [...lipidInput];
     updatedInputs[index][field] = value;
-
     setLipidInput(updatedInputs);
   };
 
   return (
     <div className="h-screen flex relative overflow-hidden">
       <div
-        className={`h-full relative w-[350px] border-r-2 shadow-xl p-4 pt-2 bg-[whitesmoke] ${
+        className={`h-full relative w-[370px] border-r-2 shadow-xl p-4 bg-[whitesmoke] ${
           collapse && "max-w-[0] !p-0"
         }`}
       >
@@ -39,15 +37,6 @@ function Lipid() {
         </span>
         {!collapse && (
           <>
-            <div
-              className="flex items-center cursor-pointer py-1 border-b border-gray-500 mb-3"
-              onClick={() => (window.location.href = "/")}
-            >
-              <img src="logo.gif" alt="" className="w-14 h-12" />
-              <h1 className="font-medium tracking-wider text-lg">
-                Lipid Membrane
-              </h1>
-            </div>
             <div>
               <SelectComponentType
                 setLipidInput={setLipidInput}
@@ -72,17 +61,8 @@ function Lipid() {
           </>
         )}
       </div>
-      <div className="w-full h-full relative"></div>
-      <div className="m-2">
-        <Button
-          startIcon={<InfoIcon />}
-          variant="contained"
-          size="small"
-          className="!text-sm"
-          href="/upload"
-        >
-          Lipid Info
-        </Button>
+      <div className="w-full h-full relative">
+        <Header />
       </div>
     </div>
   );
