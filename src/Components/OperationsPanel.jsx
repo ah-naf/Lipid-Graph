@@ -1,8 +1,13 @@
 import { styled } from "@mui/material/styles";
 import { TreeView } from "@mui/x-tree-view";
 import { TreeItem, treeItemClasses } from "@mui/x-tree-view/TreeItem";
+import { useDispatch, useSelector } from "react-redux";
+import { changeOperationID } from "../Slices/LipidSlice";
 
 const OperationsPanel = () => {
+  const dispatch = useDispatch();
+  const operationID = useSelector((state) => state.lipid.operationID);
+
   const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.text.secondary,
     [`& .${treeItemClasses.content}`]: {
@@ -30,6 +35,7 @@ const OperationsPanel = () => {
       display: "none",
     },
   }));
+  
   return (
     <div className="mt-6">
       <p className="font-medium text-gray-800/80 text-center underline">
@@ -38,7 +44,8 @@ const OperationsPanel = () => {
       <div className="mt-2">
         <TreeView
           aria-label="controlled"
-          onNodeSelect={(e, b) => console.log(b)}
+          selected={operationID}
+          onNodeSelect={(e, b) => dispatch(changeOperationID(b))}
         >
           <StyledTreeItemRoot
             nodeId="1"
