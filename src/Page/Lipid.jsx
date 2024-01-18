@@ -1,8 +1,10 @@
 import { ArrowRight } from "@mui/icons-material";
+import { CircularProgress } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import ActualPredicted from "../Components/ActualPredicted";
 import ChartComponent from "../Components/ChartComponent";
 import Header from "../Components/Header";
 import LipidInputForm from "../Components/LipidInputForm";
@@ -12,7 +14,7 @@ import UploadFile from "../Components/UploadFile";
 import { changeActiveLipid, changeOperationID } from "../Slices/LipidSlice";
 
 // const data = JSON.parse(graph_data);
-const data = [];
+// console.log(JSON.stringify(data["APC"]))
 
 function Lipid() {
   const [collapse, setCollapse] = useState(false);
@@ -20,6 +22,19 @@ function Lipid() {
   const [lipidInput, setLipidInput] = useState([{ name: "", percentage: 100 }]);
   const dispatch = useDispatch();
   const operationID = useSelector((state) => state.lipid.operationID);
+  const isLoading = useSelector((state) => state.lipid.loading);
+  const data = useSelector((state) => state.lipid.data);
+  const [graph_data, setGraphData] = useState([]);
+
+  useEffect(() => {
+    if (data.predicted) {
+      let temp = [];
+      for (const val of lipidInput) {
+        if (data.predicted[val.name]) temp.push(data.predicted[val.name]);
+      }
+      setGraphData(temp);
+    }
+  }, [data, lipidInput]);
 
   useEffect(() => {
     dispatch(changeActiveLipid(lipidInput));
@@ -81,9 +96,21 @@ function Lipid() {
             </>
           )}
         </div>
-        <div className="w-full h-full flex-grow">
+        <div className="w-full h-full flex-grow relative">
           <Toaster />
-          {operationID === "1" && <ChartComponent />}
+          {isLoading ? (
+            <div className="w-full h-full flex flex-col items-center justify-center relative -top-12">
+              <h3 className="font-medium mb-2">Fetching Data...</h3>
+              <CircularProgress />
+            </div>
+          ) : operationID === "1" ? (
+            <div className="w-full h-full">
+              <ActualPredicted />
+              {graph_data && <ChartComponent graph_data={graph_data} />}
+            </div>
+          ) : (
+            <div>{/* <ActualPredicted /> */}</div>
+          )}
         </div>
       </div>
     </div>
