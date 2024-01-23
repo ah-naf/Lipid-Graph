@@ -109,7 +109,7 @@ function ChartComponent({ graph_data, id = "1" }) {
         ></div>
       ) : (
         <div className="w-full h-full grid place-content-center">
-          <h1 className="font-medium text-2xl">No data found</h1>
+          <h1 className="font-medium text-2xl">No structure found</h1>
         </div>
       )}
     </div>

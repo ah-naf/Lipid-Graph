@@ -26,6 +26,31 @@ export const getMoleculeStructure = createAsyncThunk(
   }
 );
 
+export const getPredictions = createAsyncThunk(
+  "lipid/getPredictions",
+  async (molecule, { rejectWithValue }) => {
+    try {
+      // TODO: update body if working with multiple lipid component. Below code only work for single component
+      const body = {
+        issingle: molecule.length === 1,
+        lipid_name: molecule[0].name,
+      };
+      const res = await fetch(`${URL}/prediction/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      return data;
+      // return { data, mol_name };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const initialState = {
   lipid: [],
   type: "single",
@@ -69,6 +94,18 @@ export const lipidSlice = createSlice({
           actual: { [payload]: graphData[payload] },
         };
       }
+      state.loading = false;
+    });
+    builder.addCase(getPredictions.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getPredictions.fulfilled, (state, { payload }) => {
+      // TODO: change pred value while working with multiple component
+      state.data = { ...payload, pred: payload.pred[0][0] };
+      state.loading = false;
+    });
+    builder.addCase(getPredictions.rejected, (state) => {
+      state.data = {};
       state.loading = false;
     });
   },

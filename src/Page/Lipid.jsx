@@ -109,13 +109,32 @@ function Lipid() {
           ) : (
             <div className="w-full h-full grid place-items-center">
               {operationID === "0" && (
-                <h1 className="font-medium text-3xl mt-10">Select an operation</h1>
+                <h1 className="font-medium text-3xl mt-10">
+                  Select an operation
+                </h1>
               )}
               {operationID === "1" && (
                 <>
                   <ActualPredicted />
                   <ChartComponent graph_data={graph_data} />
                 </>
+              )}
+              {operationID === "2" && (
+                <div className="w-full h-full flex flex-col items-center p-2">
+                  <h1 className="bg-violet-500 text-gray-100 mt-2 p-2 px-4 text-lg rounded shadow font-mono">
+                    Prediction Value:{" "}
+                    <span className="text-white font-semibold">20.34</span>
+                  </h1>
+                  {data.graph ? (
+                    <img
+                      className="mt-8"
+                      src={`data:image/png;base64,${data.graph}`}
+                      alt=""
+                    />
+                  ) : (
+                    <h1 className="mt-4">No predicted data found.</h1>
+                  )}
+                </div>
               )}
             </div>
           )}
