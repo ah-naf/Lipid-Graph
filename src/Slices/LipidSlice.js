@@ -6,18 +6,23 @@ const URL = "http://127.0.0.1:8000";
 
 export const getMoleculeStructure = createAsyncThunk(
   "lipid/getMoleculeStructure",
-  async (mol_name) => {
-    const res = await fetch(`${URL}/edge_pred/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mol_name,
-      }),
-    });
-    const data = await res.json();
-    return { data, mol_name };
+  async (mol_name, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${URL}/edge_pred/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mol_name,
+        }),
+      });
+      const data = await res.json();
+
+      return { data, mol_name };
+    } catch (error) {
+      return rejectWithValue(mol_name);
+    }
   }
 );
 
@@ -45,7 +50,7 @@ export const lipidSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getMoleculeStructure.fulfilled, (state, { payload }) => {
-      const { linkWith, ...rest } = payload.data;
+      const { linkWith, ...rest } = payload.data.predicted_edge;
       state.data = {
         ...state.data,
         actual: { [payload.mol_name]: graphData[payload.mol_name] },
@@ -56,7 +61,14 @@ export const lipidSlice = createSlice({
     builder.addCase(getMoleculeStructure.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(getMoleculeStructure.rejected, (state) => {
+    builder.addCase(getMoleculeStructure.rejected, (state, { payload }) => {
+      state.data = { ...state.data, actual: undefined, predicted: undefined };
+      if (graphData[payload]) {
+        state.data = {
+          ...state.data,
+          actual: { [payload]: graphData[payload] },
+        };
+      }
       state.loading = false;
     });
   },
