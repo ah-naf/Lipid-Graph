@@ -7,6 +7,7 @@ function GraphTable() {
   const [rowData, setRowData] = useState([]);
 
   useEffect(() => {
+    if(!edges) return;
     const nodeEdgesMap = {};
     edges.forEach((edge) => {
       edge.forEach((node) => {

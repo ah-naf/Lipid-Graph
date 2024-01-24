@@ -120,7 +120,7 @@ function Lipid() {
                   <ActualPredicted />
                   <div className="w-full h-full flex items-center">
                     <ChartComponent graph_data={graph_data} />
-                    <div className={`${showTable ? "w-[600px]" : "w-0"}`}>
+                    <div className={`${showTable ? "w-[600px] px-2" : "w-0"}`}>
                       <GraphTable />
                     </div>
                   </div>
