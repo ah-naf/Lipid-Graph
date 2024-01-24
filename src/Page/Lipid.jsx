@@ -118,9 +118,9 @@ function Lipid() {
               {operationID === "1" && (
                 <>
                   <ActualPredicted />
-                  <div className="w-full h-full flex items-center">
+                  <div className="w-full h-full flex">
                     <ChartComponent graph_data={graph_data} />
-                    <div className={`${showTable ? "w-[600px] px-2" : "w-0"}`}>
+                    <div className={`${showTable ? "w-[600px] px-2" : "w-0"} relative top-16`}>
                       <GraphTable />
                     </div>
                   </div>
