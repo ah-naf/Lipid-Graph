@@ -57,6 +57,7 @@ const initialState = {
   operationID: "0",
   loading: false,
   data: {},
+  showTable: false
 };
 
 export const lipidSlice = createSlice({
@@ -72,6 +73,9 @@ export const lipidSlice = createSlice({
     changeOperationID: (state, { payload }) => {
       state.operationID = payload;
     },
+    changeShowTable: (state) => {
+      state.showTable = !state.showTable
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getMoleculeStructure.fulfilled, (state, { payload }) => {
@@ -80,6 +84,7 @@ export const lipidSlice = createSlice({
         ...state.data,
         actual: { [payload.mol_name]: graphData[payload.mol_name] },
         predicted: { [payload.mol_name]: rest },
+        edge_table: payload.data.edge_data,
       };
       state.loading = false;
     });
@@ -112,7 +117,7 @@ export const lipidSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { changeActiveLipid, changeNumOfComp, changeOperationID } =
+export const { changeActiveLipid, changeNumOfComp, changeOperationID, changeShowTable } =
   lipidSlice.actions;
 
 export default lipidSlice.reducer;
