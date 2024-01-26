@@ -4,13 +4,11 @@ import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import ActualPredicted from "../Components/ActualPredicted";
-import ActvspredGraph from "../Components/ActvspredGraph.jsx";
-import ChartComponent from "../Components/ChartComponent";
-import GraphTable from "../Components/GraphTable";
 import Header from "../Components/Header";
 import LipidInputForm from "../Components/LipidInputForm";
+import MoleculeStructure from "../Components/MoleculeStructure.jsx";
 import OperationsPanel from "../Components/OperationsPanel";
+import PredictionKappa from "../Components/PredictionKappa.jsx";
 import SelectComponentType from "../Components/SelectComponentType";
 import UploadFile from "../Components/UploadFile";
 import { changeActiveLipid, changeOperationID } from "../Slices/LipidSlice";
@@ -115,43 +113,8 @@ function Lipid() {
                   Select an operation
                 </h1>
               )}
-              {operationID === "1" && (
-                <>
-                  <ActualPredicted />
-                  <div className="w-full h-full flex items-center">
-                    <ChartComponent graph_data={graph_data} />
-                    <div className={`${showTable ? "w-[600px] px-2" : "w-0"}`}>
-                      <GraphTable />
-                    </div>
-                  </div>
-                </>
-              )}
-              {operationID === "2" && (
-                <div className="w-full h-full flex flex-col items-center p-2">
-                  <h1 className="bg-violet-500 text-gray-100 mt-2 p-2 px-4 text-lg rounded shadow font-mono">
-                    Prediction Value:{" "}
-                    <span className="text-white font-semibold">
-                      {data.pred}
-                    </span>
-                  </h1>
-                  {data.graph ? (
-                    <img
-                      className="mt-8"
-                      src={`data:image/png;base64,${data.graph}`}
-                      alt=""
-                    />
-                  ) : (
-                    <h1 className="mt-4">No predicted data found.</h1>
-                  )}
-                  <div className="grid grid-cols-3 gap-8 w-full mt-8">
-                    <div className="w-full">
-                      <h3 className="text-center font-medium mb-2 text-lg">Actual vs Predicted for - {lipidInput[0].name}</h3>
-                      <ActvspredGraph />
-                    </div>
-                    <div></div>
-                  </div>
-                </div>
-              )}
+              {operationID === "1" && <MoleculeStructure />}
+              {operationID === "2" && <PredictionKappa />}
             </div>
           )}
         </div>
