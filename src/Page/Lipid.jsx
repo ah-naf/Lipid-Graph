@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ActualPredicted from "../Components/ActualPredicted";
+import ActvspredGraph from "../Components/ActvspredGraph.jsx";
 import ChartComponent from "../Components/ChartComponent";
 import GraphTable from "../Components/GraphTable";
 import Header from "../Components/Header";
@@ -13,7 +14,6 @@ import OperationsPanel from "../Components/OperationsPanel";
 import SelectComponentType from "../Components/SelectComponentType";
 import UploadFile from "../Components/UploadFile";
 import { changeActiveLipid, changeOperationID } from "../Slices/LipidSlice";
-
 // const data = JSON.parse(graph_data);
 // console.log(JSON.stringify(data["APC"]))
 
@@ -109,7 +109,7 @@ function Lipid() {
               <CircularProgress />
             </div>
           ) : (
-            <div className="w-full h-full grid place-items-center">
+            <div className="w-full h-full grid place-items-center overflow-y-auto px-2">
               {operationID === "0" && (
                 <h1 className="font-medium text-3xl mt-10">
                   Select an operation
@@ -118,9 +118,9 @@ function Lipid() {
               {operationID === "1" && (
                 <>
                   <ActualPredicted />
-                  <div className="w-full h-full flex">
+                  <div className="w-full h-full flex items-center">
                     <ChartComponent graph_data={graph_data} />
-                    <div className={`${showTable ? "w-[600px] px-2" : "w-0"} relative top-16`}>
+                    <div className={`${showTable ? "w-[600px] px-2" : "w-0"}`}>
                       <GraphTable />
                     </div>
                   </div>
@@ -130,7 +130,9 @@ function Lipid() {
                 <div className="w-full h-full flex flex-col items-center p-2">
                   <h1 className="bg-violet-500 text-gray-100 mt-2 p-2 px-4 text-lg rounded shadow font-mono">
                     Prediction Value:{" "}
-                    <span className="text-white font-semibold">{data.pred}</span>
+                    <span className="text-white font-semibold">
+                      {data.pred}
+                    </span>
                   </h1>
                   {data.graph ? (
                     <img
@@ -141,6 +143,13 @@ function Lipid() {
                   ) : (
                     <h1 className="mt-4">No predicted data found.</h1>
                   )}
+                  <div className="grid grid-cols-3 gap-8 w-full mt-8">
+                    <div className="w-full">
+                      <h3 className="text-center font-medium mb-2 text-lg">Actual vs Predicted for - {lipidInput[0].name}</h3>
+                      <ActvspredGraph />
+                    </div>
+                    <div></div>
+                  </div>
                 </div>
               )}
             </div>
