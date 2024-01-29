@@ -57,7 +57,7 @@ const PredictionKappa = () => {
                 </h2>
               )}
             </div>
-            <div className="min-w-[500px]">
+            <div className="min-w-[400px]">
               <AgGridTable
                 rowData={data.loss && data.loss.table ? data.loss.table : []}
               />
@@ -80,7 +80,7 @@ const PredictionKappa = () => {
                 </h2>
               )}
             </div>
-            <div className="min-w-[500px]">
+            <div className="min-w-[400px]">
               <AgGridTable
                 rowData={data.r2 && data.r2.table ? data.r2.table : []}
               />
