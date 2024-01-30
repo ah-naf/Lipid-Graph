@@ -3,8 +3,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { styled } from "@mui/material/styles";
 import { TreeView } from "@mui/x-tree-view";
 import { TreeItem, treeItemClasses } from "@mui/x-tree-view/TreeItem";
-import { useDispatch, useSelector } from "react-redux";
-import { changeOperationID } from "../Slices/LipidSlice";
+import { useSelector } from "react-redux";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -30,14 +29,11 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   },
 }));
 
-const OperationsPanel = () => {
-  const dispatch = useDispatch();
-  const operationID = useSelector((state) => state.lipid.operationID);
-  const lipid = useSelector((state) => state.lipid.lipid);
-  const loading = useSelector((state) => state.lipid.loading);
+const OperationsPanel = ({ setOperationID, operationID }) => {
+  const loading = false;
 
   const handleNodeSelect = async (b) => {
-    dispatch(changeOperationID(b));
+    setOperationID(b);
   };
 
   return (
@@ -53,12 +49,7 @@ const OperationsPanel = () => {
           defaultExpandIcon={<ArrowRightIcon />}
           defaultCollapseIcon={<ArrowDropDownIcon />}
         >
-          <StyledTreeItemRoot
-            nodeId="prediction"
-            label="Prediction"
-          >
-            <StyledTreeItemRoot nodeId="structure" label="Molecule Structure" />
-          </StyledTreeItemRoot>
+          <StyledTreeItemRoot nodeId="prediction" label="Prediction" />
           <StyledTreeItemRoot nodeId="evaluation" label="Evaluation">
             <StyledTreeItemRoot nodeId="loss" label="Train-Test Loss" />
             <StyledTreeItemRoot nodeId="r2" label="R-squared" />
@@ -67,6 +58,7 @@ const OperationsPanel = () => {
               label="Actual vs Predicted"
             />
           </StyledTreeItemRoot>
+          <StyledTreeItemRoot nodeId="structure" label="Structure Analysis" />
         </TreeView>
       </div>
     </div>

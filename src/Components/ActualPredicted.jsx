@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
-import { changeShowTable } from "../Slices/LipidSlice";
+import { changeShowTable } from "../Slices/StructureAnalysisSlice";
 import ChartComponent from "./ChartComponent";
 
 function ActualPredicted() {

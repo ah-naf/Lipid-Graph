@@ -1,52 +1,20 @@
 import { ArrowRight } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import EvaluationGraphTable from "../Components/EvaluationGraphTable.jsx";
 import Header from "../Components/Header";
+import MoleculeStructure from "../Components/MoleculeStructure.jsx";
 import OperationsPanel from "../Components/OperationsPanel";
 import Prediction from "../Components/Prediction.jsx";
-import { changeActiveLipid, changeOperationID } from "../Slices/LipidSlice";
 // const data = JSON.parse(graph_data);
 // console.log(JSON.stringify(data["APC"]))
 
 function Lipid() {
   const [collapse, setCollapse] = useState(false);
-  const [type, setType] = useState("single");
-  const [lipidInput, setLipidInput] = useState([{ name: "", percentage: 100 }]);
-  const dispatch = useDispatch();
-  const operationID = useSelector((state) => state.lipid.operationID);
-  const isLoading = useSelector((state) => state.lipid.loading);
-  const data = useSelector((state) => state.lipid.data);
-  const [graph_data, setGraphData] = useState([]);
-  const showTable = useSelector((state) => state.lipid.showTable);
-
-  useEffect(() => {
-    if (data && data.predicted) {
-      let temp = [];
-      for (const val of lipidInput) {
-        if (data.predicted[val.name]) temp.push(data.predicted[val.name]);
-      }
-      setGraphData(temp);
-    } else setGraphData(undefined);
-  }, [data, lipidInput]);
-
-  useEffect(() => {
-    dispatch(changeActiveLipid(lipidInput));
-    dispatch(changeOperationID("0"));
-  }, [lipidInput]);
-
-  const handleInputChange = (index, field, value) => {
-    // Deep copy the object to ensure we're not modifying a read-only reference
-    const updatedInputs = lipidInput.map((input, idx) =>
-      idx === index ? { ...input, [field]: value } : { ...input }
-    );
-
-    // Update the state with the new array
-    setLipidInput(updatedInputs);
-  };
+  const [operationID, setOperationID] = useState("0");
+  const isLoading = false;
 
   return (
     <div className="h-screen  relative overflow-hidden">
@@ -68,7 +36,10 @@ function Lipid() {
           </span>
           {!collapse && (
             <>
-              <OperationsPanel />
+              <OperationsPanel
+                setOperationID={setOperationID}
+                operationID={operationID}
+              />
 
               <div className="absolute z-50 left-0 text-center bottom-0 border-t-2 w-full py-2">
                 <Link
@@ -99,6 +70,7 @@ function Lipid() {
                 </h1>
               )}
               {operationID === "prediction" && <Prediction />}
+              {operationID === "structure" && <MoleculeStructure />}
 
               {/* TODO: Send loss or r2 or actualvspred graph table */}
               {(operationID === "loss" ||
