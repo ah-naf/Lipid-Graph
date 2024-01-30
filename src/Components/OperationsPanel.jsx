@@ -50,13 +50,15 @@ const OperationsPanel = () => {
           aria-label="controlled"
           selected={operationID}
           onNodeSelect={(e, b) => handleNodeSelect(b)}
-          defaultExpandIcon={<ArrowRightIcon color="red" />}
+          defaultExpandIcon={<ArrowRightIcon />}
           defaultCollapseIcon={<ArrowDropDownIcon />}
         >
           <StyledTreeItemRoot
             nodeId="prediction"
             label="Prediction"
-          ></StyledTreeItemRoot>
+          >
+            <StyledTreeItemRoot nodeId="structure" label="Molecule Structure" />
+          </StyledTreeItemRoot>
           <StyledTreeItemRoot nodeId="evaluation" label="Evaluation">
             <StyledTreeItemRoot nodeId="loss" label="Train-Test Loss" />
             <StyledTreeItemRoot nodeId="r2" label="R-squared" />

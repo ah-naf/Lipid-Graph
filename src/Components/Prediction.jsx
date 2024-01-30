@@ -1,12 +1,23 @@
 import { Input, Radio, Space } from "antd";
-import TextArea from "antd/lib/input/TextArea";
+import TextArea from "antd/es/input/TextArea";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import toast, { Toaster } from "react-hot-toast";
 
 const { Group: RadioGroup, Button: RadioButton } = Radio;
 
-// Input component for Lipid Composition with optional percentage
+/**
+ * CompositionInput renders a flexible input form for lipid composition.
+ * It displays a name input always and an optional percentage input.
+ *
+ * @param {Object} props - Component props
+ * @param {number} props.id - Identifier for the composition, used in state management.
+ * @param {boolean} props.showPercentage - Flag to show percentage input.
+ * @param {string} props.name - Current name of the lipid composition.
+ * @param {number} props.percentage - Current percentage of the lipid composition.
+ * @param {Function} props.onCompositionChange - Callback to handle changes in composition data.
+ */
+
 const CompositionInput = ({
   id,
   showPercentage,
@@ -46,7 +57,16 @@ const CompositionInput = ({
   </div>
 );
 
-// Input component for file upload or custom data entry
+/**
+ * BeadsBondsInput provides an input mechanism for either uploading a file or entering data manually.
+ * It switches between a file uploader and a text area based on the selected input type.
+ *
+ * @param {Object} props - Component props
+ * @param {string} props.label - Label for the input section.
+ * @param {string} props.inputType - Current selected input type ('upload' or 'custom').
+ * @param {Function} props.setInputType - Callback to change the input type.
+ */
+
 const BeadsBondsInput = ({ label, inputType, setInputType }) => (
   <div className="mt-4">
     <label htmlFor="" className="text-gray-800">
@@ -78,52 +98,34 @@ const BeadsBondsInput = ({ label, inputType, setInputType }) => (
   </div>
 );
 
-// Main prediction component
+/**
+ * Prediction is the main component that manages the state and logic of the application.
+ * It handles the rendering of composition inputs, file uploads, and other data fields.
+ */
+
 function Prediction() {
   const [type, setType] = useState("single");
-  const [data, setData] = useState({
-    "Number of Water": "",
-    Salt: "",
-    Temperature: "",
-    Pressure: "",
-    "Number of Lipid Per Layer": "",
-    "Membrane Thickness": "",
-    "Kappa KT(q^-4 + b)": "",
-    "Kappa Binning (KT)": "",
-    "Kappa Gamma / Binning": "",
-    "Kappa BW DCF": "",
-    "Kappa RSF": "",
-  });
-  const [adjacencyInputType, setAdjacencyInputType] = useState("upload");
-  const [nodeFeatureInputType, setNodeFeatureInputType] = useState("upload");
-  const [compositions, setCompositions] = useState({
-    comp1: { name: "", percentage: 100 },
-  });
+  const [data, setData] = useState(initialDataState());
+  const [compositions, setCompositions] = useState(initialCompositionState());
+  const [adjacencyInputType, setAdjacencyInputType] = useState('upload')
+  const [nodeFeatureInputType, setNodeFeatureInputType] = useState('upload')
+
+  const handleTypeChange = (newType) => {
+    setType(newType);
+    setCompositions(compositionStateOnTypeChange(newType));
+  };
 
   const handleCompositionChange = (id, field, value) => {
-    setCompositions((prevCompositions) => {
-      // If changing percentage in 'multiple' mode
-      if (field === "percentage" && type === "multiple") {
-        // Calculate the total percentage including the current change
-        const totalPercentage =
-          id === "comp1"
-            ? value + prevCompositions.comp2.percentage
-            : prevCompositions.comp1.percentage + value;
-
-        // Check if total percentage exceeds 100%
-        if (totalPercentage > 100) {
-          // Optionally: provide feedback to user that the total percentage cannot exceed 100%
-          toast.error("Total percentage cannot exceed 100%");
-          return prevCompositions;
-        }
-      }
-
-      // Update normally for all other cases
-      return {
-        ...prevCompositions,
-        [id]: { ...prevCompositions[id], [field]: value },
-      };
-    });
+    const updatedCompositions = getUpdatedCompositions(
+      compositions,
+      id,
+      field,
+      value,
+      type
+    );
+    if (updatedCompositions) {
+      setCompositions(updatedCompositions);
+    }
   };
 
   const handleInputChange = (e, key) => {
@@ -131,26 +133,14 @@ function Prediction() {
   };
 
   return (
-    <div className="w-full h-full p-4 ">
+    <div className="w-full h-full p-4">
       <Toaster />
       <div className="text-center mb-8">
         <RadioGroup
           name="radiogroup"
           size="large"
           defaultValue={type}
-          onChange={(e) => {
-            setType(e.target.value);
-            if (e.target.value === "single") {
-              setCompositions({
-                comp1: { name: "", percentage: 100 },
-              });
-            } else {
-              setCompositions({
-                comp1: { name: "", percentage: 0 },
-                comp2: { name: "", percentage: 0 },
-              });
-            }
-          }}
+          onChange={(e) => handleTypeChange(e.target.value)}
           buttonStyle="solid"
         >
           <RadioButton value={"single"}>Single Composition</RadioButton>
@@ -207,8 +197,95 @@ function Prediction() {
           </div>
         ))}
       </div>
+
+      <div className="w-full mt-4 text-right">
+        <button className="bg-blue-500 p-2 px-6 shadow rounded tracking-wider text-white font-medium">Predict</button>
+      </div>
+      <div className="my-4 text-2xl gap-4 mt-8 flex font-mono items-center justify-center">
+        <h1 className="text-gray-800">Prediction for <span className="text-gray-900 font-bold tracking-wide">POPC</span> is: </h1>
+        <p className="bg-violet-500 text-white font-bold p-2 px-4 rounded">20.30</p>
+      </div>
     </div>
   );
 }
+
+/**
+ * Returns the initial state for the data fields in the Prediction component.
+ * It initializes all fields with empty strings.
+ *
+ * @returns {Object} The initial data state object.
+ */
+
+const initialDataState = () => ({
+  "Number of Water": "",
+  Salt: "",
+  Temperature: "",
+  Pressure: "",
+  "Number of Lipid Per Layer": "",
+  "Membrane Thickness": "",
+  "Kappa KT(q^-4 + b)": "",
+  "Kappa Binning (KT)": "",
+  "Kappa Gamma / Binning": "",
+  "Kappa BW DCF": "",
+  "Kappa RSF": "",
+});
+
+/**
+ * Returns the initial state for the lipid compositions.
+ * Sets up the initial names and percentages for compositions.
+ *
+ * @returns {Object} The initial composition state object.
+ */
+
+const initialCompositionState = () => ({
+  comp1: { name: "", percentage: 100 },
+  comp2: { name: "", percentage: 0 },
+});
+
+/**
+ * Determines the state of compositions based on the selected type ('single' or 'multiple').
+ * In 'single' mode, it sets comp1 percentage to 100%, and in 'multiple' mode, it sets both to 0%.
+ *
+ * @param {string} newType - The selected composition type.
+ * @returns {Object} The updated composition state object.
+ */
+
+const compositionStateOnTypeChange = (newType) =>
+  newType === "single"
+    ? { comp1: { name: "", percentage: 100 } }
+    : {
+        comp1: { name: "", percentage: 0 },
+        comp2: { name: "", percentage: 0 },
+      };
+
+/**
+ * Calculates and returns the updated state for compositions.
+ * In 'multiple' mode, it validates the total percentage does not exceed 100%.
+ * Returns null if validation fails.
+ *
+ * @param {Object} compositions - The current compositions state.
+ * @param {string} id - The composition identifier being updated.
+ * @param {string} field - The field in the composition being updated ('name' or 'percentage').
+ * @param {number|string} value - The new value for the field.
+ * @param {string} type - The current selected type ('single' or 'multiple').
+ * @returns {Object|null} The updated compositions state object or null if validation fails.
+ */
+
+const getUpdatedCompositions = (compositions, id, field, value, type) => {
+  if (field === "percentage" && type === "multiple") {
+    const totalPercentage =
+      id === "comp1"
+        ? value + compositions.comp2.percentage
+        : compositions.comp1.percentage + value;
+    if (totalPercentage > 100) {
+      toast.error("Total percentage cannot exceed 100%");
+      return null;
+    }
+  }
+  return {
+    ...compositions,
+    [id]: { ...compositions[id], [field]: value },
+  };
+};
 
 export default Prediction;
