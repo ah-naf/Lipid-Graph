@@ -4,13 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import EvaluationGraphTable from "../Components/EvaluationGraphTable.jsx";
 import Header from "../Components/Header";
-import LipidInputForm from "../Components/LipidInputForm";
-import MoleculeStructure from "../Components/MoleculeStructure.jsx";
 import OperationsPanel from "../Components/OperationsPanel";
-import PredictionKappa from "../Components/PredictionKappa.jsx";
-import SelectComponentType from "../Components/SelectComponentType";
-import UploadFile from "../Components/UploadFile";
+import Prediction from "../Components/Prediction.jsx";
 import { changeActiveLipid, changeOperationID } from "../Slices/LipidSlice";
 // const data = JSON.parse(graph_data);
 // console.log(JSON.stringify(data["APC"]))
@@ -56,8 +53,8 @@ function Lipid() {
       <Header />
       <div className="flex h-full w-full">
         <div
-          className={`relative border-r-2 shadow-xl p-4 bg-[whitesmoke] flex flex-col ${
-            collapse && "max-w-[0] !p-0"
+          className={`relative border-r-2 min-w-[250px] shadow-xl p-4 bg-[whitesmoke] flex flex-col ${
+            collapse && "min-w-[0] !p-0"
           }`}
           style={{ height: "calc(100vh - 68px)" }}
         >
@@ -71,20 +68,8 @@ function Lipid() {
           </span>
           {!collapse && (
             <>
-              <div>
-                <SelectComponentType
-                  setLipidInput={setLipidInput}
-                  type={type}
-                  setType={setType}
-                />
-                <LipidInputForm
-                  handleInputChange={handleInputChange}
-                  lipidInput={lipidInput}
-                  type={type}
-                />
-              </div>
-              {lipidInput.length > 0 && <OperationsPanel />}
-              <UploadFile />
+              <OperationsPanel />
+
               <div className="absolute z-50 left-0 text-center bottom-0 border-t-2 w-full py-2">
                 <Link
                   to={"/about-us"}
@@ -108,13 +93,19 @@ function Lipid() {
             </div>
           ) : (
             <div className="w-full h-full grid place-items-center overflow-y-auto px-2">
-              {operationID === "0" && (
+              {(operationID === "0" || operationID === "evaluation") && (
                 <h1 className="font-medium text-3xl mt-10">
                   Select an operation
                 </h1>
               )}
-              {operationID === "1" && <MoleculeStructure />}
-              {operationID === "2" && <PredictionKappa />}
+              {operationID === "prediction" && <Prediction />}
+
+              {/* TODO: Send loss or r2 or actualvspred graph table */}
+              {(operationID === "loss" ||
+                operationID === "r2" ||
+                operationID === "actualvspred") && (
+                <EvaluationGraphTable graph={undefined} table={undefined} />
+              )}
             </div>
           )}
         </div>
