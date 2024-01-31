@@ -53,11 +53,10 @@ export const getPredictions = createAsyncThunk(
 );
 
 const initialState = {
-  lipid: [],
+  lipid: [{name: '', percentage: 100}],
   type: "single",
-  operationID: "0",
   loading: false,
-  data: {},
+  data: undefined,
   showTable: false,
 };
 

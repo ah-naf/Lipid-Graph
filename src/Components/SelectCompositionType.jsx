@@ -14,6 +14,7 @@ const SelectCompositionType = ({ type, setType, setLipidInput }) => {
       <Select
         defaultValue={type}
         style={{ width: "100%" }}
+        size="large"
         onChange={(e) => {
           if (e === "single") {
             setLipidInput([{ name: "", percentage: 100 }]);

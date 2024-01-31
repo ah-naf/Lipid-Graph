@@ -22,7 +22,7 @@ function Lipid() {
       <div className="flex h-full w-full">
         <div
           className={`relative border-r-2 min-w-[250px] shadow-xl p-4 bg-[whitesmoke] flex flex-col ${
-            collapse && "min-w-[0] !p-0"
+            collapse && "!min-w-[0] !p-0"
           }`}
           style={{ height: "calc(100vh - 68px)" }}
         >
