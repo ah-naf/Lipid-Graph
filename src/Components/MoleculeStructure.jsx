@@ -16,7 +16,7 @@ function MoleculeStructure() {
   const [type, setType] = useState("single");
   const [lipidInput, setLipidInput] = useState([{ name: "", percentage: 100 }]);
   const dispatch = useDispatch();
-  const { loading, data, showTable } = useSelector((state) => state.structure);
+  const { loading, data, showTable, lipid } = useSelector((state) => state.structure);
   const [open, setOpen] = useState(false);
 
   const handleInputChange = (index, field, value) => {
@@ -76,7 +76,7 @@ function MoleculeStructure() {
           {data && (
             <>
               <h1 className="text-2xl font-bold font-mono text-center mt-8">
-                Structure Analysis for {lipidInput[0].name}
+                Structure Analysis for {lipid[0].name}
               </h1>
               <div className="w-full h-full border p-2 mt-6 shadow rounded">
                 <div className="text-center space-x-4 mt-2">
@@ -96,9 +96,10 @@ function MoleculeStructure() {
                 <ActualPredicted open={open} setIsOpen={setOpen} />
                 <div className="w-full h-full flex items-center">
                   <ChartComponent
+                    id={Date.now()}
                     graph_data={
                       data &&
-                      data.predicted && [data.predicted[lipidInput[0].name]]
+                      data.predicted && [data.predicted[lipid[0].name]]
                     }
                   />
                   <div className={`${showTable ? "w-[600px] px-2" : "w-0"}`}>

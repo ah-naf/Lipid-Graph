@@ -70,7 +70,6 @@ export const structureAnalysis = createSlice({
     changeNumOfComp: (state, { payload }) => {
       state.type = payload;
     },
-
     changeShowTable: (state) => {
       state.showTable = !state.showTable;
     },
