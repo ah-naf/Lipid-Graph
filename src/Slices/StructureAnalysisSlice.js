@@ -53,15 +53,14 @@ export const getPredictions = createAsyncThunk(
 );
 
 const initialState = {
-  lipid: [],
+  lipid: [{name: '', percentage: 100}],
   type: "single",
-  operationID: "0",
   loading: false,
-  data: {},
+  data: undefined,
   showTable: false,
 };
 
-export const lipidSlice = createSlice({
+export const structureAnalysis = createSlice({
   name: "lipid",
   initialState,
   reducers: {
@@ -70,9 +69,6 @@ export const lipidSlice = createSlice({
     },
     changeNumOfComp: (state, { payload }) => {
       state.type = payload;
-    },
-    changeOperationID: (state, { payload }) => {
-      state.operationID = payload;
     },
     changeShowTable: (state) => {
       state.showTable = !state.showTable;
@@ -126,8 +122,7 @@ export const lipidSlice = createSlice({
 export const {
   changeActiveLipid,
   changeNumOfComp,
-  changeOperationID,
   changeShowTable,
-} = lipidSlice.actions;
+} = structureAnalysis.actions;
 
-export default lipidSlice.reducer;
+export default structureAnalysis.reducer;

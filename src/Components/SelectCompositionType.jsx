@@ -1,18 +1,20 @@
 import { Select } from "antd";
 import { useDispatch } from "react-redux";
-import { changeNumOfComp, changeOperationID } from "../Slices/LipidSlice";
+import {
+  changeNumOfComp,
+} from "../Slices/StructureAnalysisSlice";
 
-const SelectComponentType = ({ type, setType, setLipidInput }) => {
+const SelectCompositionType = ({ type, setType, setLipidInput }) => {
   const dispatch = useDispatch();
   return (
     <div className="space-y-1.5">
       <label htmlFor="numOfComp" className=" text-gray-700 font-medium">
-        Number of Components
+        Number of Compositions
       </label>
       <Select
-        size="large"
         defaultValue={type}
         style={{ width: "100%" }}
+        size="large"
         onChange={(e) => {
           if (e === "single") {
             setLipidInput([{ name: "", percentage: 100 }]);
@@ -23,7 +25,6 @@ const SelectComponentType = ({ type, setType, setLipidInput }) => {
             ]);
           }
           dispatch(changeNumOfComp(e));
-          dispatch(changeOperationID("0"));
           setType(e);
         }}
         options={[
@@ -35,4 +36,4 @@ const SelectComponentType = ({ type, setType, setLipidInput }) => {
   );
 };
 
-export default SelectComponentType;
+export default SelectCompositionType;
