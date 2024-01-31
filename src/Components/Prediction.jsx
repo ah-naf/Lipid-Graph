@@ -1,4 +1,4 @@
-import { Input, Radio, Space } from "antd";
+import { Input, InputNumber, Radio, Space } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
@@ -67,32 +67,41 @@ const CompositionInput = ({
  * @param {Function} props.setInputType - Callback to change the input type.
  */
 
-const BeadsBondsInput = ({ label, inputType, setInputType }) => (
+const BeadsBondsInput = ({
+  label,
+  inputType,
+  setInputType,
+  value,
+  handleFileChange,
+  handleTextChange,
+}) => (
   <div className="mt-4">
-    <label htmlFor="" className="text-gray-800">
-      {label}
-    </label>
+    <label className="text-gray-800">{label}</label>
     <div className="flex mt-2 gap-4 items-center">
       <RadioGroup
-        defaultValue={inputType}
+        value={inputType}
         onChange={(e) => setInputType(e.target.value)}
         buttonStyle="solid"
       >
         <Space direction="vertical">
-          <RadioButton value={"upload"}>Upload</RadioButton>
-          <RadioButton value={"custom"}>Custom</RadioButton>
+          <RadioButton value="upload">Upload</RadioButton>
+          <RadioButton value="custom">Custom</RadioButton>
         </Space>
       </RadioGroup>
       {inputType === "upload" ? (
         <FileUploader
           name="file"
-          types={["txt"]}
-          onDrop={(e) => console.log(e)}
-          onChange={(e) => console.log(e)}
+          handleChange={(file) => {
+            handleFileChange(file);
+          }}
           classes="dndFile"
         />
       ) : (
-        <TextArea placeholder="Input Data (Separated by comma)" />
+        <TextArea
+          placeholder="Input Data (Separated by comma)"
+          value={value.text}
+          onChange={(e) => handleTextChange(e.target.value)}
+        />
       )}
     </div>
   </div>
@@ -107,8 +116,34 @@ function Prediction() {
   const [type, setType] = useState("single");
   const [data, setData] = useState(initialDataState());
   const [compositions, setCompositions] = useState(initialCompositionState());
-  const [adjacencyInputType, setAdjacencyInputType] = useState('upload')
-  const [nodeFeatureInputType, setNodeFeatureInputType] = useState('upload')
+  const [adjacencyInputType, setAdjacencyInputType] = useState("upload");
+  const [nodeFeatureInputType, setNodeFeatureInputType] = useState("upload");
+
+  const [adjacencyInput, setAdjacencyInput] = useState({
+    file: null,
+    text: "",
+  });
+  const [nodeFeatureInput, setNodeFeatureInput] = useState({
+    file: null,
+    text: "",
+  });
+
+  const handleFileChange = (file, type) => {
+    if (type === "adjacency") {
+      setAdjacencyInput((prev) => ({ ...prev, file }));
+      
+    } else if (type === "nodeFeature") {
+      setNodeFeatureInput((prev) => ({ ...prev, file }));
+    }
+  };
+
+  const handleTextInputChange = (text, type) => {
+    if (type === "adjacency") {
+      setAdjacencyInput((prev) => ({ ...prev, text }));
+    } else if (type === "nodeFeature") {
+      setNodeFeatureInput((prev) => ({ ...prev, text }));
+    }
+  };
 
   const handleTypeChange = (newType) => {
     setType(newType);
@@ -129,7 +164,46 @@ function Prediction() {
   };
 
   const handleInputChange = (e, key) => {
-    setData({ ...data, [key]: e.target.value });
+    setData({ ...data, [key]: e });
+  };
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    
+    // Add file and text data
+    if (adjacencyInput.file) {
+      formData.append("adjacencyFile", adjacencyInput.file);
+    }
+    formData.append("adjacencyText", adjacencyInput.text);
+
+    if (nodeFeatureInput.file) {
+      formData.append("nodeFeatureFile", nodeFeatureInput.file);
+    }
+    formData.append("nodeFeatureText", nodeFeatureInput.text);
+
+    // Add other data fields
+    formData.append("type", type);
+    formData.append("compositions", JSON.stringify(compositions));
+    formData.append("data", JSON.stringify(data));
+
+    // Send the request
+    try {
+      console.log(formData.get("adjacencyFile"));
+      const response = await fetch("http://localhost:8000/test/", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log(result);
+      // Handle result here
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error);
+    }
   };
 
   return (
@@ -176,11 +250,17 @@ function Prediction() {
         label="Beads-Bonds Structure (Adjacency Matrix)"
         inputType={adjacencyInputType}
         setInputType={setAdjacencyInputType}
+        value={adjacencyInput}
+        handleFileChange={(file) => handleFileChange(file, "adjacency")}
+        handleTextChange={(text) => handleTextInputChange(text, "adjacency")}
       />
       <BeadsBondsInput
         label="Beads-Bonds Structure (Node Feature Matrix)"
         inputType={nodeFeatureInputType}
         setInputType={setNodeFeatureInputType}
+        value={nodeFeatureInput}
+        handleFileChange={(file) => handleFileChange(file, "nodeFeature")}
+        handleTextChange={(text) => handleTextInputChange(text, "nodeFeature")}
       />
       <div className="grid grid-cols-2 gap-4 mt-6">
         {Object.keys(data).map((key) => (
@@ -188,9 +268,9 @@ function Prediction() {
             <label htmlFor="" className="text-gray-800">
               {key.replace(/([A-Z])/g, " $1").trim()}
             </label>
-            <Input
+            <InputNumber
               size="large"
-              className="mt-1"
+              className="mt-1 w-full"
               value={data[key]}
               onChange={(e) => handleInputChange(e, key)}
             />
@@ -199,11 +279,22 @@ function Prediction() {
       </div>
 
       <div className="w-full mt-4 text-right">
-        <button className="bg-blue-500 p-2 px-6 shadow rounded tracking-wider text-white font-medium">Predict</button>
+        <button
+          className="bg-blue-500 p-2 px-6 shadow rounded tracking-wider text-white font-medium"
+          onClick={handleSubmit}
+        >
+          Predict
+        </button>
       </div>
       <div className="my-4 text-2xl gap-4 mt-8 flex font-mono items-center justify-center">
-        <h1 className="text-gray-800">Prediction for <span className="text-gray-900 font-bold tracking-wide">POPC</span> is: </h1>
-        <p className="bg-violet-500 text-white font-bold p-2 px-4 rounded">20.30</p>
+        <h1 className="text-gray-800">
+          Prediction for{" "}
+          <span className="text-gray-900 font-bold tracking-wide">POPC</span>{" "}
+          is:{" "}
+        </h1>
+        <p className="bg-violet-500 text-white font-bold p-2 px-4 rounded">
+          20.30
+        </p>
       </div>
     </div>
   );
