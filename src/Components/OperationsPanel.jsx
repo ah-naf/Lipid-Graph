@@ -52,7 +52,7 @@ const OperationsPanel = ({ setOperationID, operationID }) => {
           <StyledTreeItemRoot nodeId="prediction" label="Prediction" />
           <StyledTreeItemRoot nodeId="evaluation" label="Evaluation">
             <StyledTreeItemRoot nodeId="loss" label="Train-Test Loss" />
-            <StyledTreeItemRoot nodeId="r2" label="R-squared" />
+            {/* <StyledTreeItemRoot nodeId="r2" label="R-squared" /> */}
             <StyledTreeItemRoot
               nodeId="actualvspred"
               label="Actual vs Predicted"

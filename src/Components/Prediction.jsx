@@ -210,7 +210,7 @@ function Prediction() {
   return (
     <div className="w-full h-full p-4">
       <Toaster />
-      <div className="text-center mb-8">
+      {/* <div className="text-center mb-8">
         <RadioGroup
           name="radiogroup"
           size="large"
@@ -221,7 +221,7 @@ function Prediction() {
           <RadioButton value={"single"}>Single Composition</RadioButton>
           <RadioButton value={"multiple"}>Multiple Composition</RadioButton>
         </RadioGroup>
-      </div>
+      </div> */}
       {type === "single" ? (
         <CompositionInput
           id={1}
@@ -301,7 +301,7 @@ function Prediction() {
                 is:{" "}
               </h1>
               <p className="bg-violet-500 text-white font-bold p-2 px-4 rounded">
-                {predictionValue}
+                {predictionValue.toFixed(3)}
               </p>
             </div>
           )}

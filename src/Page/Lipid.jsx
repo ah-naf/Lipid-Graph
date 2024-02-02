@@ -8,6 +8,7 @@ import Header from "../Components/Header";
 import MoleculeStructure from "../Components/MoleculeStructure.jsx";
 import OperationsPanel from "../Components/OperationsPanel";
 import Prediction from "../Components/Prediction.jsx";
+import { useSelector } from "react-redux";
 // const data = JSON.parse(graph_data);
 // console.log(JSON.stringify(data["APC"]))
 
@@ -76,7 +77,7 @@ function Lipid() {
               {(operationID === "loss" ||
                 operationID === "r2" ||
                 operationID === "actualvspred") && (
-                <EvaluationGraphTable graph={undefined} table={undefined} />
+                <EvaluationGraphTable operationID={operationID} />
               )}
             </div>
           )}
