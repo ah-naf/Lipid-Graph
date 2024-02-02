@@ -118,6 +118,8 @@ function Prediction() {
   const [compositions, setCompositions] = useState(initialCompositionState());
   const [adjacencyInputType, setAdjacencyInputType] = useState("upload");
   const [nodeFeatureInputType, setNodeFeatureInputType] = useState("upload");
+  const [predictionValue, setPredictionValue] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [adjacencyInput, setAdjacencyInput] = useState({
     file: null,
@@ -131,7 +133,6 @@ function Prediction() {
   const handleFileChange = (file, type) => {
     if (type === "adjacency") {
       setAdjacencyInput((prev) => ({ ...prev, file }));
-      
     } else if (type === "nodeFeature") {
       setNodeFeatureInput((prev) => ({ ...prev, file }));
     }
@@ -169,7 +170,7 @@ function Prediction() {
 
   const handleSubmit = async () => {
     const formData = new FormData();
-    
+    setLoading(true);
     // Add file and text data
     if (adjacencyInput.file) {
       formData.append("adjacencyFile", adjacencyInput.file);
@@ -188,7 +189,6 @@ function Prediction() {
 
     // Send the request
     try {
-      console.log(formData.get("adjacencyFile"));
       const response = await fetch("http://localhost:8000/test/", {
         method: "POST",
         body: formData,
@@ -199,7 +199,8 @@ function Prediction() {
       }
 
       const result = await response.json();
-      console.log(result);
+      setPredictionValue(result.pred);
+      setLoading(false);
       // Handle result here
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
@@ -286,16 +287,26 @@ function Prediction() {
           Predict
         </button>
       </div>
-      <div className="my-4 text-2xl gap-4 mt-8 flex font-mono items-center justify-center">
-        <h1 className="text-gray-800">
-          Prediction for{" "}
-          <span className="text-gray-900 font-bold tracking-wide">POPC</span>{" "}
-          is:{" "}
-        </h1>
-        <p className="bg-violet-500 text-white font-bold p-2 px-4 rounded">
-          20.30
-        </p>
-      </div>
+      {loading ? (
+        <h1 className="mt-6 font-bold text-2xl">Fetching data...</h1>
+      ) : (
+        <>
+          {predictionValue && (
+            <div className="my-4 text-2xl gap-4 mt-8 flex font-mono items-center justify-center">
+              <h1 className="text-gray-800">
+                Prediction for{" "}
+                <span className="text-gray-900 font-bold tracking-wide">
+                  {compositions.comp1.name}
+                </span>{" "}
+                is:{" "}
+              </h1>
+              <p className="bg-violet-500 text-white font-bold p-2 px-4 rounded">
+                {predictionValue}
+              </p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -308,15 +319,12 @@ function Prediction() {
  */
 
 const initialDataState = () => ({
-  "Number of Water": "",
-  Salt: "",
-  Temperature: "",
-  Pressure: "",
+  "Number of Water": 2915,
+  Salt: 0.15,
+  Temperature: 310,
+  Pressure: 1,
   "Number of Lipid Per Layer": "",
   "Membrane Thickness": "",
-  "Kappa KT(q^-4 + b)": "",
-  "Kappa Binning (KT)": "",
-  "Kappa Gamma / Binning": "",
   "Kappa BW DCF": "",
   "Kappa RSF": "",
 });
