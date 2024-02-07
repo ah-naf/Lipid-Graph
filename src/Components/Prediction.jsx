@@ -28,7 +28,7 @@ const CompositionInput = ({
 }) => (
   <div className="flex items-center gap-4">
     <div className="w-full">
-      <label className="text-gray-800">
+      <label className="text-gray-800 font-bold">
         Lipid Composition Name{showPercentage ? `-${id}` : ""}
       </label>
       <Input
@@ -43,6 +43,7 @@ const CompositionInput = ({
         <label className="text-gray-800">Percentage</label>
         <Input
           value={`${percentage}`}
+          className="!font-bold"
           onChange={(e) =>
             onCompositionChange(
               `comp${id}`,
@@ -77,7 +78,7 @@ const BeadsBondsInput = ({
   handleTextChange,
 }) => (
   <div className="mt-4">
-    <label className="text-gray-800">{label}</label>
+    <label className="text-gray-800 font-semibold">{label}</label>
     <div className="flex mt-2 gap-4 items-center">
       <RadioGroup
         value={inputType}
@@ -116,14 +117,14 @@ const BeadsBondsInput = ({
 function Prediction() {
   const [type, setType] = useState("single");
   const [data, setData] = useState({
-    "Number of Water": 2915,
-    Salt: 0.15,
+    "Number of Water Molecules": "",
+    "Salt (moles per liter)": 0.15,
     Temperature: 310,
     Pressure: 1,
-    "Number of Lipid Per Layer": "",
+    "Number of Lipid Per Layer": 2915,
     "Membrane Thickness": "",
-    "Kappa BW DCF": "",
-    "Kappa RSF": "",
+    "Kappa BW-DCF(Bandwidth Dependent Die-electric Constant Fluctuation)": "",
+    "Kappa-RSF": "",
   });
   const [compositions, setCompositions] = useState(initialCompositionState());
   const [adjacencyInputType, setAdjacencyInputType] = useState("upload");
@@ -285,7 +286,7 @@ function Prediction() {
         handleTextChange={(text) => handleTextInputChange(text, "adjacency")}
       />
       <BeadsBondsInput
-        label="Beads-Bonds Structure (Node Feature Matrix)"
+        label="Beads Properties Structure (Node Feature Matrix)"
         inputType={nodeFeatureInputType}
         setInputType={setNodeFeatureInputType}
         value={nodeFeatureInput}
@@ -295,7 +296,10 @@ function Prediction() {
       <div className="grid grid-cols-2 gap-4 mt-6">
         {Object.keys(data).map((key) => (
           <div key={key}>
-            <label htmlFor="" className="text-gray-800">
+            <label
+              htmlFor=""
+              className="text-gray-800 tracking-tight font-semibold"
+            >
               {key.replace(/([A-Z])/g, " $1").trim()}
             </label>
             <InputNumber
