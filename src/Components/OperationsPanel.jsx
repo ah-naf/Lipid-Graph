@@ -13,7 +13,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     paddingRight: theme.spacing(1),
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(1),
-    fontWeight: theme.typography.fontWeightMedium,
+    fontWeight: theme.typography.fontWeightBold,
 
     "&:hover": {
       backgroundColor: "#c7d2fe",
@@ -38,7 +38,7 @@ const OperationsPanel = ({ setOperationID, operationID }) => {
 
   return (
     <div className="">
-      <p className="font-medium mb-1 text-lg text-gray-800/80 text-center underline">
+      <p className="font-semibold mb-4 text-2xl text-gray-800/80 text-center underline">
         Operations
       </p>
       <div className={`mt-2 ${loading && "pointer-events-none"}`}>

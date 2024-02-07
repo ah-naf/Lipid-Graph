@@ -184,13 +184,15 @@ function Prediction() {
       (!adjacencyInput.file && !adjacencyInput.text) ||
       (!nodeFeatureInput.file && !nodeFeatureInput.text) ||
       !compositions.comp1.name ||
-      !data["Kappa BW DCF"] ||
-      !data["Kappa RSF"] ||
+      !data[
+        "Kappa BW-DCF(Bandwidth Dependent Die-electric Constant Fluctuation)"
+      ] ||
+      !data["Kappa-RSF"] ||
       !data["Membrane Thickness"] ||
       !data["Number of Lipid Per Layer"] ||
-      !data["Number of Water"] ||
+      !data["Number of Water Molecules"] ||
       !data["Pressure"] ||
-      !data["Salt"] ||
+      !data["Salt (moles per liter)"] ||
       !data["Temperature"]
     ) {
       toast.error("Fill all the input fields");

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import AboutUs from "./Page/AboutUs";
 import Lipid from "./Page/Lipid";
@@ -8,11 +8,14 @@ import { evaluateModel } from "./Slices/EvaluationSlice";
 
 function App() {
   const dispatch = useDispatch();
+  const loading = useSelector((state) => state.evaluation.loading);
 
   useEffect(() => {
-    dispatch(evaluateModel());
+    if (!loading) {
+      dispatch(evaluateModel());
+    }
   }, []);
-  
+
   return (
     <Routes>
       <Route path="/" element={<Lipid />} />
