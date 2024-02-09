@@ -1,5 +1,6 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import { CircularProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { TreeView } from "@mui/x-tree-view";
 import { TreeItem, treeItemClasses } from "@mui/x-tree-view/TreeItem";
@@ -30,7 +31,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 }));
 
 const OperationsPanel = ({ setOperationID, operationID }) => {
-  const loading = false;
+  const { data, loading } = useSelector((state) => state.evaluation);
 
   const handleNodeSelect = async (b) => {
     setOperationID(b);
@@ -42,24 +43,41 @@ const OperationsPanel = ({ setOperationID, operationID }) => {
         Operations
       </p>
       <div className={`mt-2 ${loading && "pointer-events-none"}`}>
-        <TreeView
-          aria-label="controlled"
-          selected={operationID}
-          onNodeSelect={(e, b) => handleNodeSelect(b)}
-          defaultExpandIcon={<ArrowRightIcon />}
-          defaultCollapseIcon={<ArrowDropDownIcon />}
-        >
-          <StyledTreeItemRoot nodeId="prediction" label="Prediction" />
-          <StyledTreeItemRoot nodeId="evaluation" label="Evaluation">
-            <StyledTreeItemRoot nodeId="loss" label="Train-Test Loss" />
-            {/* <StyledTreeItemRoot nodeId="r2" label="R-squared" /> */}
-            <StyledTreeItemRoot
-              nodeId="actualvspred"
-              label="Actual vs Predicted"
-            />
-          </StyledTreeItemRoot>
-          <StyledTreeItemRoot nodeId="structure" label="Structure Analysis" />
-        </TreeView>
+        {data ? (
+          <TreeView
+            aria-label="controlled"
+            selected={operationID}
+            onNodeSelect={(e, b) => handleNodeSelect(b)}
+            defaultExpandIcon={<ArrowRightIcon />}
+            defaultCollapseIcon={<ArrowDropDownIcon />}
+          >
+            <StyledTreeItemRoot nodeId="prediction" label="Prediction" />
+            <StyledTreeItemRoot nodeId="evaluation" label="Evaluation">
+              <StyledTreeItemRoot nodeId="loss" label="Train-Test Loss" />
+              {/* <StyledTreeItemRoot nodeId="r2" label="R-squared" /> */}
+              <StyledTreeItemRoot
+                nodeId="actualvspred"
+                label="Actual vs Predicted"
+              />
+            </StyledTreeItemRoot>
+            <StyledTreeItemRoot nodeId="structure" label="Structure Analysis" />
+          </TreeView>
+        ) : (
+          <div className="text-center">
+            <button
+              className={`${
+                !loading && "hover:text-gray-100 hover:bg-blue-500/90"
+              } w-full text-white font-medium bg-blue-500 py-2.5 rounded`}
+              disabled={loading}
+            >
+              {!loading ? (
+                "Create Model"
+              ) : (
+                <CircularProgress color="inherit" size={"25px"} />
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

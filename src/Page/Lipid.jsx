@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 function Lipid() {
   const [collapse, setCollapse] = useState(false);
   const [operationID, setOperationID] = useState("0");
-  const isLoading = false;
+  const isLoading = useSelector((state) => state.evaluation.loading);
 
   return (
     <div className="h-screen  relative overflow-hidden">
@@ -60,12 +60,19 @@ function Lipid() {
           <Toaster />
           {isLoading ? (
             <div className="w-full h-full flex flex-col items-center justify-center relative -top-12">
-              <h3 className="font-medium mb-2">Fetching Data...</h3>
+              <h3 className="font-medium mb-2 text-2xl">
+                Model is Being Created...
+              </h3>
               <CircularProgress />
             </div>
           ) : (
             <div className="w-full h-full grid place-items-center overflow-y-auto px-2">
-              {(operationID === "0" || operationID === "evaluation") && (
+              {operationID === "0" && (
+                <h1 className="font-medium text-3xl mt-10">
+                  Create a model first...
+                </h1>
+              )}
+              {operationID === "evaluation" && (
                 <h1 className="font-medium text-3xl mt-10">
                   Select an operation
                 </h1>
