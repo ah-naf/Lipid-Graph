@@ -33,17 +33,20 @@ const CompositionInput = ({
       </label>
       <Input
         value={name}
+        size="large"
+        className="mt-1.5"
         onChange={(e) =>
           onCompositionChange(`comp${id}`, "name", e.target.value)
         }
       />
     </div>
     {showPercentage && (
-      <div>
+      <div className="">
         <label className="text-gray-800">Percentage</label>
         <Input
+          size="large"
           value={`${percentage}`}
-          className="!font-bold"
+          className="!font-bold mt-1.5"
           onChange={(e) =>
             onCompositionChange(
               `comp${id}`,
@@ -302,11 +305,11 @@ function Prediction() {
               htmlFor=""
               className="text-gray-800 tracking-tight font-semibold"
             >
-              {key.replace(/([A-Z])/g, " $1").trim()}
+              {key}
             </label>
             <InputNumber
               size="large"
-              className="mt-1 w-full"
+              className="mt-1.5 w-full"
               value={data[key]}
               onChange={(e) => handleInputChange(e, key)}
             />

@@ -4,7 +4,8 @@ import { CircularProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { TreeView } from "@mui/x-tree-view";
 import { TreeItem, treeItemClasses } from "@mui/x-tree-view/TreeItem";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { evaluateModel } from "../Slices/EvaluationSlice";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -32,9 +33,14 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
 const OperationsPanel = ({ setOperationID, operationID }) => {
   const { data, loading } = useSelector((state) => state.evaluation);
+  const dispatch = useDispatch();
 
   const handleNodeSelect = async (b) => {
     setOperationID(b);
+  };
+
+  const handleModelCreate = async () => {
+    dispatch(evaluateModel());
   };
 
   return (
@@ -42,8 +48,23 @@ const OperationsPanel = ({ setOperationID, operationID }) => {
       <p className="font-semibold mb-4 text-2xl text-gray-800/80 text-center underline">
         Operations
       </p>
-      <div className={`mt-2 ${loading && "pointer-events-none"}`}>
-        {data ? (
+      <div className="text-center">
+        <button
+          className={`${
+            !loading && "hover:text-gray-100 hover:bg-blue-500/90"
+          } w-full text-white font-medium bg-blue-500 py-2 rounded`}
+          disabled={loading}
+          onClick={handleModelCreate}
+        >
+          {!loading ? (
+            "Create Model"
+          ) : (
+            <CircularProgress color="inherit" size={"25px"} />
+          )}
+        </button>
+      </div>
+      <div className={`mt-3 ${loading && "pointer-events-none"}`}>
+        {data && !loading && (
           <TreeView
             aria-label="controlled"
             selected={operationID}
@@ -62,21 +83,6 @@ const OperationsPanel = ({ setOperationID, operationID }) => {
             </StyledTreeItemRoot>
             <StyledTreeItemRoot nodeId="structure" label="Structure Analysis" />
           </TreeView>
-        ) : (
-          <div className="text-center">
-            <button
-              className={`${
-                !loading && "hover:text-gray-100 hover:bg-blue-500/90"
-              } w-full text-white font-medium bg-blue-500 py-2.5 rounded`}
-              disabled={loading}
-            >
-              {!loading ? (
-                "Create Model"
-              ) : (
-                <CircularProgress color="inherit" size={"25px"} />
-              )}
-            </button>
-          </div>
         )}
       </div>
     </div>

@@ -2,20 +2,20 @@ import { ArrowRight } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
 import React, { useState } from "react";
 import { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import EvaluationGraphTable from "../Components/EvaluationGraphTable.jsx";
 import Header from "../Components/Header";
 import MoleculeStructure from "../Components/MoleculeStructure.jsx";
 import OperationsPanel from "../Components/OperationsPanel";
 import Prediction from "../Components/Prediction.jsx";
-import { useSelector } from "react-redux";
 // const data = JSON.parse(graph_data);
 // console.log(JSON.stringify(data["APC"]))
 
 function Lipid() {
   const [collapse, setCollapse] = useState(false);
   const [operationID, setOperationID] = useState("0");
-  const isLoading = useSelector((state) => state.evaluation.loading);
+  const { loading, data } = useSelector((state) => state.evaluation);
 
   return (
     <div className="h-screen  relative overflow-hidden">
@@ -58,7 +58,7 @@ function Lipid() {
           style={{ height: "calc(100vh - 68px)" }}
         >
           <Toaster />
-          {isLoading ? (
+          {loading ? (
             <div className="w-full h-full flex flex-col items-center justify-center relative -top-12">
               <h3 className="font-medium mb-2 text-2xl">
                 Model is Being Created...
@@ -67,24 +67,27 @@ function Lipid() {
             </div>
           ) : (
             <div className="w-full h-full grid place-items-center overflow-y-auto px-2">
-              {operationID === "0" && (
-                <h1 className="font-medium text-3xl mt-10">
-                  Create a model first...
+              {!data ? (
+                <h1 className="font-medium text-2xl mt-10">
+                  Create a Model First...
                 </h1>
-              )}
-              {operationID === "evaluation" && (
-                <h1 className="font-medium text-3xl mt-10">
-                  Select an operation
-                </h1>
-              )}
-              {operationID === "prediction" && <Prediction />}
-              {operationID === "structure" && <MoleculeStructure />}
+              ) : (
+                <>
+                  {(operationID === "0" || operationID === "evaluation") && (
+                    <h1 className="font-medium text-2xl mt-10">
+                      Select an operation
+                    </h1>
+                  )}
+                  {operationID === "prediction" && <Prediction />}
+                  {operationID === "structure" && <MoleculeStructure />}
 
-              {/* TODO: Send loss or r2 or actualvspred graph table */}
-              {(operationID === "loss" ||
-                operationID === "r2" ||
-                operationID === "actualvspred") && (
-                <EvaluationGraphTable operationID={operationID} />
+                  {/* TODO: Send loss or r2 or actualvspred graph table */}
+                  {(operationID === "loss" ||
+                    operationID === "r2" ||
+                    operationID === "actualvspred") && (
+                    <EvaluationGraphTable operationID={operationID} />
+                  )}
+                </>
               )}
             </div>
           )}
