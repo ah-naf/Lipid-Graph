@@ -24,36 +24,23 @@ function Prediction() {
     "Kappa BW-DCF(Bandwidth Dependent Die-electric Constant Fluctuation)": "",
     "Kappa-RSF": "",
   });
-  const [compositions, setCompositions] = useState(initialCompositionState());
+  const [compositions, setCompositions] = useState({
+    comp1: { name: "", percentage: 100 },
+    comp2: { name: "", percentage: 0 },
+  });
   const [predictionValue, setPredictionValue] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [inputs, setInputs] = useState([
-    {
+  const [inputs, setInputs] = useState(
+    new Array(4).fill(null).map((_, i) => ({
       inputType: "upload",
       file: null,
       text: "",
-      label: "Beads-Bonds Structure (Adjacency Matrix) for Lipid-1",
-    },
-    {
-      inputType: "upload",
-      file: null,
-      text: "",
-      label: "Beads Properties Structure (Node Feature Matrix) for Lipid-1",
-    },
-    {
-      inputType: "upload",
-      file: null,
-      text: "",
-      label: "Beads-Bonds Structure (Adjacency Matrix) for Lipid-2",
-    },
-    {
-      inputType: "upload",
-      file: null,
-      text: "",
-      label: "Beads Properties Structure (Node Feature Matrix) for Lipid-2",
-    },
-  ]);
+      label: `Beads-${i % 2 === 0 ? "Bonds" : "Properties"} Structure (${
+        i % 2 === 0 ? "Adjacency" : "Node Feature"
+      } Matrix) for Lipid-${Math.floor(i / 2) + 1}`,
+    }))
+  );
 
   const setInputsType = (index, newType) => {
     setInputs((prev) =>
@@ -92,7 +79,6 @@ function Prediction() {
   };
 
   const handleCompositionChange = (id, field, value) => {
-    console.log(id, field, value);
     setCompositions((prevCompositions) => {
       // Create a copy of the previous state
       const newCompositions = { ...prevCompositions };
@@ -121,43 +107,38 @@ function Prediction() {
     });
   };
 
-  const handleInputChange = (e, key) => {
-    setData({ ...data, [key]: e });
-  };
+  const handleInputChange = (e, key) =>
+    setData((prev) => ({ ...prev, [key]: e }));
 
   const validateInputs = () => {
-    // Check for compositions first
-    const compositionNamesFilled =
-      type === "single"
-        ? !!compositions.comp1.name
-        : !!compositions.comp1.name && !!compositions.comp2.name;
-    if (!compositionNamesFilled) {
-      toast.error("Fill all the required composition fields");
-      return false;
+    // Adjusting required inputs based on type
+    const requiredInputs = type === "single" ? inputs.slice(0, 2) : inputs;
+
+    // For "single", check only comp1; for "multiple", check both comp1 and comp2
+    let compositionsFilled = true;
+    if (type === "single") {
+      compositionsFilled = !!compositions.comp1.name; // Check only comp1 for "single"
+    } else if (type === "multiple") {
+      compositionsFilled = Object.values(compositions).every(
+        (comp) => comp.name
+      ); // Check both for "multiple"
     }
 
-    // Check for inputs based on type
-    const inputsToCheck = type === "single" ? inputs.slice(0, 2) : inputs;
-    const inputsFilled = inputsToCheck.every(
+    const inputsFilled = requiredInputs.every(
       (input) => input.file || input.text
     );
-    if (!inputsFilled) {
-      toast.error("Fill all the required input fields");
-      return false;
-    }
-
-    // Check for all data fields being filled
     const dataFieldsFilled = Object.values(data).every((value) => value !== "");
-    if (!dataFieldsFilled) {
-      toast.error("Fill all the required data fields");
+
+    if (!compositionsFilled || !inputsFilled || !dataFieldsFilled) {
+      toast.error("Fill all the required fields");
       return false;
     }
-
     return true;
   };
 
   const handleSubmit = async () => {
     if (!validateInputs()) return;
+
     const formData = new FormData();
 
     inputs.forEach((input, index) => {
@@ -173,10 +154,13 @@ function Prediction() {
       formData.append(`${type}Text${lipidNumber}`, input.text);
     });
 
-    // Add other data fields
     formData.append("type", type);
     formData.append("compositions", JSON.stringify(compositions));
     formData.append("data", JSON.stringify(data));
+
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
 
     try {
       setLoading(true);
@@ -315,18 +299,6 @@ function Prediction() {
     </div>
   );
 }
-
-/**
- * Returns the initial state for the lipid compositions.
- * Sets up the initial names and percentages for compositions.
- *
- * @returns {Object} The initial composition state object.
- */
-
-const initialCompositionState = () => ({
-  comp1: { name: "", percentage: 100 },
-  comp2: { name: "", percentage: 0 },
-});
 
 /**
  * Determines the state of compositions based on the selected type ('single' or 'multiple').
