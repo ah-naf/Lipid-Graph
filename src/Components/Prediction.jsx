@@ -58,7 +58,9 @@ function Prediction() {
   const setInputsType = (index, newType) => {
     setInputs((prev) =>
       prev.map((item, i) =>
-        i === index ? { ...item, inputType: newType } : item
+        i === index
+          ? { ...item, inputType: newType, file: null, text: "" }
+          : item
       )
     );
   };
@@ -78,32 +80,15 @@ function Prediction() {
   const handleTypeChange = (newType) => {
     setType(newType);
     setCompositions(compositionStateOnTypeChange(newType));
-    setInputs([
-      {
+    setInputs((prev) => {
+      const temp = prev.map((val) => ({
+        ...val,
         inputType: "upload",
         file: null,
         text: "",
-        label: "Beads-Bonds Structure (Adjacency Matrix) for Lipid-1",
-      },
-      {
-        inputType: "upload",
-        file: null,
-        text: "",
-        label: "Beads Properties Structure (Node Feature Matrix) for Lipid-1",
-      },
-      {
-        inputType: "upload",
-        file: null,
-        text: "",
-        label: "Beads-Bonds Structure (Adjacency Matrix) for Lipid-2",
-      },
-      {
-        inputType: "upload",
-        file: null,
-        text: "",
-        label: "Beads Properties Structure (Node Feature Matrix) for Lipid-2",
-      },
-    ]);
+      }));
+      return temp;
+    });
   };
 
   const handleCompositionChange = (id, field, value) => {
@@ -113,7 +98,8 @@ function Prediction() {
       const newCompositions = { ...prevCompositions };
 
       // Ensure value is correctly formatted (e.g., converting string to number for percentages)
-      const formattedValue = field === "percentage" ? parseFloat(value) : value;
+      let formattedValue = field === "percentage" ? parseFloat(value) : value;
+      if (!formattedValue && field === "percentage") formattedValue = 0;
 
       // Directly update the specified field
       if (newCompositions[`comp${id}`]) {
@@ -123,16 +109,12 @@ function Prediction() {
       // For 'multiple', adjust the other composition's percentage if necessary
       if (type === "multiple" && field === "percentage") {
         const otherCompId = id === 1 ? 2 : 1; // Determine the other composition's id
-        const totalPercentage =
-          formattedValue + newCompositions[`comp${otherCompId}`].percentage;
 
         // If total exceeds 100%, adjust the other composition's percentage
-        if (totalPercentage > 100) {
-          newCompositions[`comp${otherCompId}`].percentage = Math.max(
-            100 - formattedValue,
-            0
-          );
-        }
+        newCompositions[`comp${otherCompId}`].percentage = Math.max(
+          100 - formattedValue,
+          0
+        );
       }
 
       return newCompositions;
@@ -143,26 +125,39 @@ function Prediction() {
     setData({ ...data, [key]: e });
   };
 
+  const validateInputs = () => {
+    // Check for compositions first
+    const compositionNamesFilled =
+      type === "single"
+        ? !!compositions.comp1.name
+        : !!compositions.comp1.name && !!compositions.comp2.name;
+    if (!compositionNamesFilled) {
+      toast.error("Fill all the required composition fields");
+      return false;
+    }
+
+    // Check for inputs based on type
+    const inputsToCheck = type === "single" ? inputs.slice(0, 2) : inputs;
+    const inputsFilled = inputsToCheck.every(
+      (input) => input.file || input.text
+    );
+    if (!inputsFilled) {
+      toast.error("Fill all the required input fields");
+      return false;
+    }
+
+    // Check for all data fields being filled
+    const dataFieldsFilled = Object.values(data).every((value) => value !== "");
+    if (!dataFieldsFilled) {
+      toast.error("Fill all the required data fields");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async () => {
-    // TODO: validate form
-    // if (
-    //   (!adjacencyInput.file && !adjacencyInput.text) ||
-    //   (!nodeFeatureInput.file && !nodeFeatureInput.text) ||
-    //   !compositions.comp1.name ||
-    //   !data[
-    //     "Kappa BW-DCF(Bandwidth Dependent Die-electric Constant Fluctuation)"
-    //   ] ||
-    //   !data["Kappa-RSF"] ||
-    //   !data["Membrane Thickness"] ||
-    //   !data["Number of Lipid Per Layer"] ||
-    //   !data["Number of Water Molecules"] ||
-    //   !data["Pressure"] ||
-    //   !data["Salt (moles per liter)"] ||
-    //   !data["Temperature"]
-    // ) {
-    //   toast.error("Fill all the input fields");
-    //   return;
-    // }
+    if (!validateInputs()) return;
     const formData = new FormData();
 
     inputs.forEach((input, index) => {
@@ -345,38 +340,8 @@ const compositionStateOnTypeChange = (newType) =>
   newType === "single"
     ? { comp1: { name: "", percentage: 100 } }
     : {
-        comp1: { name: "", percentage: 0 },
+        comp1: { name: "", percentage: 100 },
         comp2: { name: "", percentage: 0 },
       };
-
-/**
- * Calculates and returns the updated state for compositions.
- * In 'multiple' mode, it validates the total percentage does not exceed 100%.
- * Returns null if validation fails.
- *
- * @param {Object} compositions - The current compositions state.
- * @param {string} id - The composition identifier being updated.
- * @param {string} field - The field in the composition being updated ('name' or 'percentage').
- * @param {number|string} value - The new value for the field.
- * @param {string} type - The current selected type ('single' or 'multiple').
- * @returns {Object|null} The updated compositions state object or null if validation fails.
- */
-
-const getUpdatedCompositions = (compositions, id, field, value, type) => {
-  if (field === "percentage" && type === "multiple") {
-    const totalPercentage =
-      id === "comp1"
-        ? value + compositions.comp2.percentage
-        : compositions.comp1.percentage + value;
-    if (totalPercentage > 100) {
-      toast.error("Total percentage cannot exceed 100%");
-      return null;
-    }
-  }
-  return {
-    ...compositions,
-    [id]: { ...compositions[id], [field]: value },
-  };
-};
 
 export default Prediction;
