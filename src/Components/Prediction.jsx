@@ -158,10 +158,6 @@ function Prediction() {
     formData.append("compositions", JSON.stringify(compositions));
     formData.append("data", JSON.stringify(data));
 
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
     try {
       setLoading(true);
       const response = await fetch("http://localhost:8000/test/", {
@@ -287,6 +283,15 @@ function Prediction() {
                 <span className="text-gray-900 font-bold tracking-wide">
                   {compositions.comp1.name}
                 </span>{" "}
+                {type === "multiple" && (
+                  <>
+                    and
+                    <span className="text-gray-900 font-bold tracking-wide">
+                      {" "}
+                      {compositions.comp2.name}{" "}
+                    </span>
+                  </>
+                )}
                 is:{" "}
               </h1>
               <p className="bg-violet-500 text-white font-bold p-2 px-4 rounded">
