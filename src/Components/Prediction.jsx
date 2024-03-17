@@ -159,6 +159,10 @@ function Prediction() {
     formData.append("data", JSON.stringify(data));
 
     try {
+      for(const [key, value] of formData.entries()) {
+        console.log(key, value)
+      }
+      
       setLoading(true);
       const response = await fetch("http://localhost:8000/test/", {
         method: "POST",
@@ -188,7 +192,10 @@ function Prediction() {
           name="radiogroup"
           size="large"
           defaultValue={type}
-          onChange={(e) => handleTypeChange(e.target.value)}
+          onChange={(e) => {
+            handleTypeChange(e.target.value)
+            setPredictionValue("")
+          }}
           buttonStyle="solid"
         >
           <RadioButton value={"single"}>Single Composition</RadioButton>
